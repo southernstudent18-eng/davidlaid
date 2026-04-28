@@ -5,6 +5,52 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The David Blueprint — Training Tracker</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<!-- Firebase -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc, collection, addDoc, serverTimestamp }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBTgBMA0YLvU0BPhYJXZyXcREF8rOfApTs",
+  authDomain: "david-blueprint.firebaseapp.com",
+  databaseURL: "https://david-blueprint-default-rtdb.firebaseio.com",
+  projectId: "david-blueprint",
+  storageBucket: "david-blueprint.firebasestorage.app",
+  messagingSenderId: "190439970987",
+  appId: "1:190439970987:web:e7a987e11153b4dad13fee"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// Expose to global scope so non-module functions can call them
+window._fbAuth = auth;
+window._fbDb = db;
+window._fbDoc = doc;
+window._fbSetDoc = setDoc;
+window._fbGetDoc = getDoc;
+window._fbCollection = collection;
+window._fbAddDoc = addDoc;
+window._fbServerTimestamp = serverTimestamp;
+window._fbGoogleProvider = new GoogleAuthProvider();
+window._fbSignInWithPopup = signInWithPopup;
+window._fbSignOut = signOut;
+
+// Watch auth state
+onAuthStateChanged(auth, async (user) => {
+  window._currentUser = user || null;
+  if (user) {
+    renderUserHeader(user);
+    await loadFromFirebase(user.uid);
+  } else {
+    renderSignedOutHeader();
+  }
+});
+</script>
 <style>
 :root {
   --bg: #f7f3ec;
@@ -646,7 +692,266 @@ body::before {
 }
 .no-session p { font-size: 12px; color: var(--muted); }
 
-/* Progression badge */
+/* ======== AUTH ======== */
+.auth-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 16px;
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.1);
+  color: #fdf7ed;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.auth-btn:hover { background: rgba(255,255,255,0.18); }
+.auth-btn img {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+}
+.auth-btn.signout {
+  background: rgba(155,58,42,0.3);
+  border-color: rgba(155,58,42,0.5);
+}
+.auth-btn.signout:hover { background: rgba(155,58,42,0.5); }
+.sync-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  color: var(--accent-light);
+  letter-spacing: 1px;
+}
+.sync-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--green);
+  animation: pulse 2s infinite;
+}
+.sync-dot.syncing { background: var(--gold); animation: none; }
+.sync-dot.offline { background: var(--muted); animation: none; }
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+.login-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(28,23,19,0.92);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.login-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 48px 44px;
+  text-align: center;
+  max-width: 380px;
+  width: 90%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+}
+.login-card h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 32px;
+  color: var(--accent-dark);
+  font-weight: 400;
+  margin-bottom: 6px;
+}
+.login-card h2 span { font-style: italic; color: var(--gold); }
+.login-card p {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 28px;
+  line-height: 1.6;
+}
+.google-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 20px;
+  background: var(--accent-dark);
+  color: #fdf7ed;
+  border: none;
+  border-radius: 8px;
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.google-btn:hover { background: var(--accent); }
+.google-btn svg { flex-shrink: 0; }
+.login-skip {
+  margin-top: 14px;
+  font-size: 11px;
+  color: var(--muted);
+  cursor: pointer;
+  text-decoration: underline;
+  background: none;
+  border: none;
+  font-family: 'DM Mono', monospace;
+}
+.login-skip:hover { color: var(--accent); }
+
+/* ======== CALENDAR ======== */
+.cal-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.cal-nav button {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--accent-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+.cal-nav button:hover { background: var(--bg2); border-color: var(--accent); }
+.cal-month {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 16px;
+  color: var(--accent-dark);
+  font-weight: 600;
+}
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+}
+.cal-dow {
+  text-align: center;
+  font-size: 9px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 3px 0 5px;
+}
+.cal-day {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+  font-size: 11px;
+  cursor: default;
+  position: relative;
+  border: 1px solid transparent;
+  transition: all 0.12s;
+}
+.cal-day.empty { background: none; }
+.cal-day.other-month { color: var(--border); }
+.cal-day.today {
+  border-color: var(--gold);
+  color: var(--accent-dark);
+  font-weight: 600;
+  background: #fdf5e4;
+}
+.cal-day.trained {
+  background: var(--green-bg);
+  border-color: var(--green-light);
+}
+.cal-day.trained .cal-day-num { color: var(--green); font-weight: 600; }
+.cal-day.rest { background: var(--bg2); }
+.cal-dot-row {
+  display: flex;
+  gap: 2px;
+  margin-top: 1px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.cal-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--green);
+}
+.cal-legend {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+  font-size: 9px;
+  color: var(--muted);
+}
+.cal-legend-item { display: flex; align-items: center; gap: 5px; }
+.cal-legend-dot { width: 10px; height: 10px; border-radius: 3px; }
+.cal-stats-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 6px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-light);
+}
+.cal-stat {
+  text-align: center;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 8px 4px;
+}
+.cal-stat-val {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px;
+  color: var(--accent-dark);
+  line-height: 1;
+}
+.cal-stat-label {
+  font-size: 8px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 2px;
+}
+.heatmap-wrap {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-light);
+}
+.heatmap-title {
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.heatmap-row {
+  display: flex;
+  gap: 2px;
+  flex-wrap: wrap;
+}
+.heatmap-cell {
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+  background: var(--bg2);
+  border: 1px solid var(--border-light);
+}
+.heatmap-cell.d1 { background: #d6eacc; border-color: #c8dbb8; }
+.heatmap-cell.d2 { background: #a8d08a; border-color: #90c06e; }
+.heatmap-cell.d3 { background: #7ab852; border-color: #62a03a; }
+.heatmap-cell.d4 { background: var(--green); border-color: #4a6b2c; }
+
+/* ======== Progression badge ======== */
 .prog-badge {
   display: inline-block;
   background: var(--green-bg);
@@ -681,6 +986,10 @@ body::before {
   <div class="header-inner">
     <div class="header-title">The <span>David</span> Blueprint</div>
     <div class="header-meta">
+      <div class="sync-indicator" id="syncIndicator" style="display:none;">
+        <div class="sync-dot" id="syncDot"></div>
+        <span id="syncLabel">Synced</span>
+      </div>
       <div class="week-display">
         <label>Week</label>
         <select id="weekSelect" onchange="setWeek(this.value)">
@@ -692,9 +1001,25 @@ body::before {
           <option value="6">6 — Deload</option>
         </select>
       </div>
+      <div id="authArea">
+        <!-- rendered by JS -->
+      </div>
     </div>
   </div>
 </header>
+
+<!-- Login overlay -->
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-card">
+    <h2>The <span>David</span><br>Blueprint</h2>
+    <p>Sign in to sync your training data across all devices. Your weights, progress, and calendar are saved to your account automatically.</p>
+    <button class="google-btn" onclick="signInGoogle()">
+      <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#fff" d="M9 3.48c1.69 0 2.83.73 3.48 1.34l2.54-2.48C13.46.89 11.43 0 9 0 5.48 0 2.44 2.02.96 4.96l2.91 2.26C4.6 5.05 6.62 3.48 9 3.48z"/><path fill="#fff" d="M17.64 9.2c0-.74-.06-1.28-.19-1.84H9v3.34h4.96c-.1.83-.64 2.08-1.84 2.92l2.84 2.2c1.7-1.57 2.68-3.88 2.68-6.62z"/><path fill="#fff" d="M3.88 10.78A5.54 5.54 0 0 1 3.58 9c0-.62.11-1.22.29-1.78L.96 4.96A9 9 0 0 0 0 9c0 1.45.35 2.82.96 4.04l2.92-2.26z"/><path fill="#fff" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.84-2.2c-.76.53-1.78.9-3.12.9-2.38 0-4.4-1.57-5.12-3.74L.96 13.04C2.44 15.98 5.48 18 9 18z"/></svg>
+      Sign in with Google
+    </button>
+    <button class="login-skip" onclick="skipLogin()">Continue without signing in</button>
+  </div>
+</div>
 
 <div class="main">
 
@@ -747,6 +1072,13 @@ body::before {
           <div style="font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); margin-bottom:6px;">Mesocycle (6 weeks)</div>
           <div class="phase-track" id="phaseDots"></div>
         </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">Training Calendar</div>
+      <div class="panel-body" id="calendarPanel">
+        <!-- rendered by JS -->
       </div>
     </div>
 
@@ -941,10 +1273,149 @@ let state = JSON.parse(localStorage.getItem('david_state') || 'null') || {
   setsDone: {}, // { "U1_0_0": true }
   streak: 0,
   lastTrainDate: null,
+  calYear: new Date().getFullYear(),
+  calMonth: new Date().getMonth(),
+  startDate: null, // first ever training date
 };
 
 function save() {
   localStorage.setItem('david_state', JSON.stringify(state));
+  if (window._currentUser) {
+    syncToFirebase();
+  }
+}
+
+// =============================================
+// FIREBASE SYNC
+// =============================================
+let _syncTimer = null;
+
+function syncToFirebase() {
+  // Debounce — wait 1.5s after last change before writing
+  clearTimeout(_syncTimer);
+  setSyncStatus('syncing');
+  _syncTimer = setTimeout(async () => {
+    try {
+      const uid = window._currentUser.uid;
+      const db = window._fbDb;
+      const docRef = window._fbDoc(db, 'users', uid, 'data', 'state');
+      await window._fbSetDoc(docRef, {
+        state: JSON.stringify(state),
+        updatedAt: window._fbServerTimestamp()
+      });
+      setSyncStatus('synced');
+    } catch (e) {
+      console.error('Sync error:', e);
+      setSyncStatus('offline');
+    }
+  }, 1500);
+}
+
+async function loadFromFirebase(uid) {
+  try {
+    const db = window._fbDb;
+    const docRef = window._fbDoc(db, 'users', uid, 'data', 'state');
+    const snap = await window._fbGetDoc(docRef);
+    if (snap.exists()) {
+      const remoteState = JSON.parse(snap.data().state);
+      // Merge remote into local — remote wins for cross-device data
+      state = { ...state, ...remoteState };
+      localStorage.setItem('david_state', JSON.stringify(state));
+      // Re-render everything with loaded data
+      document.getElementById('weekSelect').value = state.currentWeek;
+      renderDayGrid();
+      renderPhaseDots();
+      renderStats();
+      renderBenchmarks();
+      renderRecentLog();
+      renderCalendar();
+      if (state.currentDay) renderSession(state.currentDay);
+      setSyncStatus('synced');
+      showToast('Progress loaded from your account ☁️', true);
+    } else {
+      // First time — push local state to Firebase
+      syncToFirebase();
+    }
+  } catch (e) {
+    console.error('Load error:', e);
+    setSyncStatus('offline');
+  }
+}
+
+async function logSessionToFirebase(sessionData) {
+  if (!window._currentUser) return;
+  try {
+    const uid = window._currentUser.uid;
+    const db = window._fbDb;
+    const colRef = window._fbCollection(db, 'users', uid, 'sessions');
+    await window._fbAddDoc(colRef, {
+      ...sessionData,
+      loggedAt: window._fbServerTimestamp()
+    });
+  } catch (e) {
+    console.error('Session log error:', e);
+  }
+}
+
+function setSyncStatus(status) {
+  const indicator = document.getElementById('syncIndicator');
+  const dot = document.getElementById('syncDot');
+  const label = document.getElementById('syncLabel');
+  if (!indicator) return;
+  indicator.style.display = 'flex';
+  dot.className = 'sync-dot';
+  if (status === 'syncing') {
+    dot.classList.add('syncing');
+    label.textContent = 'Saving...';
+  } else if (status === 'synced') {
+    label.textContent = 'Synced';
+  } else {
+    dot.classList.add('offline');
+    label.textContent = 'Offline';
+  }
+}
+
+// =============================================
+// AUTH UI
+// =============================================
+function renderUserHeader(user) {
+  document.getElementById('loginOverlay').style.display = 'none';
+  document.getElementById('syncIndicator').style.display = 'flex';
+  document.getElementById('authArea').innerHTML = `
+    <button class="auth-btn signout" onclick="signOutUser()">
+      <img src="${user.photoURL || ''}" onerror="this.style.display='none'" alt="">
+      ${user.displayName ? user.displayName.split(' ')[0] : 'You'} · Sign out
+    </button>
+  `;
+}
+
+function renderSignedOutHeader() {
+  document.getElementById('syncIndicator').style.display = 'none';
+  document.getElementById('authArea').innerHTML = `
+    <button class="auth-btn" onclick="signInGoogle()">Sign in with Google</button>
+  `;
+}
+
+async function signInGoogle() {
+  try {
+    await window._fbSignInWithPopup(window._fbAuth, window._fbGoogleProvider);
+    // onAuthStateChanged will handle the rest
+  } catch (e) {
+    console.error('Sign in error:', e);
+    showToast('Sign in failed — try again.');
+  }
+}
+
+async function signOutUser() {
+  if (!confirm('Sign out? Your data is saved to your account.')) return;
+  await window._fbSignOut(window._fbAuth);
+  window._currentUser = null;
+  showToast('Signed out.');
+}
+
+function skipLogin() {
+  document.getElementById('loginOverlay').style.display = 'none';
+  showToast('Running without sync. Data saves locally only.');
 }
 
 // =============================================
@@ -956,6 +1427,7 @@ function init() {
   renderStats();
   renderBenchmarks();
   renderRecentLog();
+  renderCalendar();
 
   document.getElementById('weekSelect').value = state.currentWeek;
   document.getElementById('statWeek').textContent = state.currentWeek;
@@ -964,6 +1436,17 @@ function init() {
     renderSession(state.currentDay);
     highlightDay(state.currentDay);
   }
+
+  // Login overlay stays visible until Firebase resolves auth state
+  // onAuthStateChanged will hide it if user is signed in
+  // skipLogin() hides it if user chooses to continue without signing in
+  // Give Firebase 3 seconds to resolve before allowing skip
+  setTimeout(() => {
+    const overlay = document.getElementById('loginOverlay');
+    if (overlay && overlay.style.display !== 'none') {
+      // Auth is slow or user not signed in — keep overlay, just ensure skip is visible
+    }
+  }, 3000);
 }
 
 // =============================================
@@ -1233,6 +1716,9 @@ function markSessionComplete(dayId) {
     state.completedDays[today].push(dayId);
   }
 
+  // Record the very first training date
+  if (!state.startDate) state.startDate = today;
+
   // Calculate tonnage for this session
   const exercises = getExercises(dayId, state.currentWeek);
   let tonnage = 0;
@@ -1267,16 +1753,35 @@ function markSessionComplete(dayId) {
     dayName: day.name,
     week: state.currentWeek,
     totalSets: exercises.reduce((a, e) => a + e.sets, 0),
-    tonnage: Math.round(tonnage / 2000 * 10) / 10, // convert to tons
+    tonnage: Math.round(tonnage / 2000 * 10) / 10,
   });
 
   // Keep last 20 logs
   if (state.logs.length > 20) state.logs = state.logs.slice(0, 20);
 
+  // Log detailed session to Firebase sessions collection
+  logSessionToFirebase({
+    date: today,
+    dayId,
+    dayName: day.name,
+    week: state.currentWeek,
+    totalSets: exercises.reduce((a, e) => a + e.sets, 0),
+    tonnage: Math.round(tonnage / 2000 * 10) / 10,
+    exercises: exercises.map((ex, ei) => ({
+      name: ex.name,
+      sets: Array.from({ length: ex.sets }, (_, si) => ({
+        set: si + 1,
+        weight: state.weights[`w_${dayId}_${ei}_${si}`] || null,
+        reps: state.reps[`r_${dayId}_${ei}_${si}`] || null,
+      }))
+    }))
+  });
+
   save();
   renderDayGrid();
   renderStats();
   renderRecentLog();
+  renderCalendar();
   renderSession(dayId);
   showToast('Session logged. Rest, eat, grow. 🏛️', true);
 }
@@ -1414,6 +1919,171 @@ function showToast(msg, success = false) {
   t.textContent = msg;
   t.className = 'toast show' + (success ? ' success' : '');
   setTimeout(() => { t.className = 'toast'; }, 2800);
+}
+
+// =============================================
+// CALENDAR
+// =============================================
+
+const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DOW = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+
+// Day type color map for dots
+const DAY_COLORS = { U1:'#5c7a3a', L1:'#8b6f47', U2:'#4a7a8b', L2:'#8b4a6f', P5:'#9b6a1a' };
+const DAY_ABBR = { U1:'UA', L1:'LA', U2:'UB', L2:'LB', P5:'P5' };
+
+function renderCalendar() {
+  const panel = document.getElementById('calendarPanel');
+  if (!panel) return;
+
+  // Ensure state has cal props
+  if (state.calYear == null) state.calYear = new Date().getFullYear();
+  if (state.calMonth == null) state.calMonth = new Date().getMonth();
+
+  const year = state.calYear;
+  const month = state.calMonth;
+  const today = new Date();
+  const todayISO = todayStr();
+
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0);
+  const startDow = firstDay.getDay(); // 0=Sun
+  const daysInMonth = lastDay.getDate();
+
+  // Build day cells
+  let cells = '';
+  // Day-of-week headers
+  DOW.forEach(d => { cells += `<div class="cal-dow">${d}</div>`; });
+
+  // Empty cells before month start
+  for (let i = 0; i < startDow; i++) {
+    cells += `<div class="cal-day empty"></div>`;
+  }
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const iso = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday = iso === todayISO;
+    const trainedDays = state.completedDays[iso] || [];
+    const wasTrained = trainedDays.length > 0;
+    const isFuture = iso > todayISO;
+
+    let cls = 'cal-day';
+    if (isToday) cls += ' today';
+    else if (wasTrained) cls += ' trained';
+    else if (!isFuture) cls += ' rest';
+
+    // Dots for each day type done
+    const dots = trainedDays.map(id =>
+      `<div class="cal-dot" style="background:${DAY_COLORS[id]||'var(--green)'}" title="${id}"></div>`
+    ).join('');
+
+    const tooltip = wasTrained ? trainedDays.map(id => DAY_ABBR[id] || id).join(', ') : (isFuture ? '' : 'Rest');
+
+    cells += `
+      <div class="${cls}" title="${tooltip}">
+        <span class="cal-day-num">${d}</span>
+        ${wasTrained ? `<div class="cal-dot-row">${dots}</div>` : ''}
+      </div>`;
+  }
+
+  // Fill remaining cells to complete last row
+  const totalCells = startDow + daysInMonth;
+  const remainder = totalCells % 7;
+  if (remainder !== 0) {
+    for (let i = 0; i < 7 - remainder; i++) {
+      cells += `<div class="cal-day empty"></div>`;
+    }
+  }
+
+  // ---- Stats ----
+  // Total training days this month
+  let monthTrained = 0;
+  for (let d = 1; d <= daysInMonth; d++) {
+    const iso = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    if ((state.completedDays[iso] || []).length > 0) monthTrained++;
+  }
+
+  // Days since first session
+  let daysSinceStart = '—';
+  if (state.startDate) {
+    const start = new Date(state.startDate);
+    const diff = Math.floor((today - start) / (1000*60*60*24));
+    daysSinceStart = diff;
+  }
+
+  // Total lifetime training days
+  const lifetimeDays = Object.values(state.completedDays).filter(v => v.length > 0).length;
+
+  // ---- 90-day heatmap ----
+  let heatCells = '';
+  for (let i = 89; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    const iso = d.toISOString().split('T')[0];
+    const count = (state.completedDays[iso] || []).length;
+    let intensity = 'd0';
+    if (count === 1) intensity = 'd1';
+    else if (count === 2) intensity = 'd2';
+    else if (count === 3) intensity = 'd3';
+    else if (count >= 4) intensity = 'd4';
+    const label = count > 0 ? `${iso}: ${count} session(s)` : iso;
+    heatCells += `<div class="heatmap-cell ${intensity}" title="${label}"></div>`;
+  }
+
+  panel.innerHTML = `
+    <div class="cal-nav">
+      <button onclick="calPrev()">‹</button>
+      <span class="cal-month">${MONTH_NAMES[month]} ${year}</span>
+      <button onclick="calNext()">›</button>
+    </div>
+    <div class="cal-grid">${cells}</div>
+    <div class="cal-legend">
+      <div class="cal-legend-item">
+        <div class="cal-legend-dot" style="background:var(--green-bg);border:1px solid var(--green-light);"></div>
+        Trained
+      </div>
+      <div class="cal-legend-item">
+        <div class="cal-legend-dot" style="background:var(--bg2);border:1px solid var(--border);"></div>
+        Rest
+      </div>
+      <div class="cal-legend-item">
+        <div class="cal-legend-dot" style="background:#fdf5e4;border:1px solid var(--gold);"></div>
+        Today
+      </div>
+    </div>
+    <div class="cal-stats-row">
+      <div class="cal-stat">
+        <div class="cal-stat-val">${monthTrained}</div>
+        <div class="cal-stat-label">This Month</div>
+      </div>
+      <div class="cal-stat">
+        <div class="cal-stat-val">${lifetimeDays}</div>
+        <div class="cal-stat-label">Total Days</div>
+      </div>
+      <div class="cal-stat">
+        <div class="cal-stat-val">${daysSinceStart}</div>
+        <div class="cal-stat-label">Day ${typeof daysSinceStart === 'number' ? daysSinceStart + 1 : '1'}</div>
+      </div>
+    </div>
+    <div class="heatmap-wrap">
+      <div class="heatmap-title">Last 90 Days</div>
+      <div class="heatmap-row">${heatCells}</div>
+    </div>
+  `;
+}
+
+function calPrev() {
+  if (state.calMonth === 0) { state.calMonth = 11; state.calYear--; }
+  else state.calMonth--;
+  save();
+  renderCalendar();
+}
+
+function calNext() {
+  if (state.calMonth === 11) { state.calMonth = 0; state.calYear++; }
+  else state.calMonth++;
+  save();
+  renderCalendar();
 }
 
 // =============================================
