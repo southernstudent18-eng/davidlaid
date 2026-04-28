@@ -12,7 +12,7 @@ import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChang
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDoc, collection, addDoc, serverTimestamp }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
+ 
 const firebaseConfig = {
   apiKey: "AIzaSyBTgBMA0YLvU0BPhYJXZyXcREF8rOfApTs",
   authDomain: "david-blueprint.firebaseapp.com",
@@ -22,11 +22,11 @@ const firebaseConfig = {
   messagingSenderId: "190439970987",
   appId: "1:190439970987:web:e7a987e11153b4dad13fee"
 };
-
+ 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-
+ 
 // Expose to global scope so non-module functions can call them
 window._fbAuth = auth;
 window._fbDb = db;
@@ -39,7 +39,7 @@ window._fbServerTimestamp = serverTimestamp;
 window._fbGoogleProvider = new GoogleAuthProvider();
 window._fbSignInWithPopup = signInWithPopup;
 window._fbSignOut = signOut;
-
+ 
 // Watch auth state
 onAuthStateChanged(auth, async (user) => {
   window._currentUser = user || null;
@@ -72,10 +72,10 @@ onAuthStateChanged(auth, async (user) => {
   --shadow: 0 2px 12px rgba(92,74,46,0.10);
   --shadow-lg: 0 8px 32px rgba(92,74,46,0.14);
 }
-
+ 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
-
+ 
 body {
   font-family: 'DM Mono', monospace;
   background: var(--bg);
@@ -84,7 +84,7 @@ body {
   font-size: 13px;
   line-height: 1.6;
 }
-
+ 
 /* Grain overlay */
 body::before {
   content: '';
@@ -95,7 +95,7 @@ body::before {
   z-index: 1000;
   opacity: 0.4;
 }
-
+ 
 /* ======== HEADER ======== */
 .header {
   background: var(--accent-dark);
@@ -155,7 +155,7 @@ body::before {
   outline: none;
 }
 .week-display select option { background: var(--accent-dark); color: #faf8f3; }
-
+ 
 /* ======== MAIN LAYOUT ======== */
 .main {
   max-width: 1100px;
@@ -166,7 +166,7 @@ body::before {
   gap: 24px;
   align-items: start;
 }
-
+ 
 /* ======== SIDEBAR ======== */
 .sidebar {
   position: sticky;
@@ -175,7 +175,7 @@ body::before {
   flex-direction: column;
   gap: 16px;
 }
-
+ 
 .panel {
   background: var(--card);
   border: 1px solid var(--border);
@@ -194,7 +194,7 @@ body::before {
   font-weight: 500;
 }
 .panel-body { padding: 14px 16px; }
-
+ 
 /* Day selector */
 .day-grid {
   display: grid;
@@ -247,7 +247,7 @@ body::before {
 .day-btn.active .day-tag { background: rgba(255,255,255,0.12); color: var(--accent-light); }
 .day-btn.completed { border-color: var(--green); }
 .day-btn.completed .day-label { color: var(--green); }
-
+ 
 /* Progress stats */
 .stat-row {
   display: grid;
@@ -276,7 +276,7 @@ body::before {
   color: var(--muted);
   margin-top: 3px;
 }
-
+ 
 /* Week progress bar */
 .week-bar-wrap { margin-top: 4px; }
 .week-bar-label {
@@ -299,7 +299,7 @@ body::before {
   border-radius: 3px;
   transition: width 0.4s ease;
 }
-
+ 
 /* Phase progress */
 .phase-track {
   display: flex;
@@ -316,10 +316,10 @@ body::before {
 }
 .phase-dot.done { background: var(--green); border-color: var(--green); }
 .phase-dot.current { background: var(--gold); border-color: var(--gold); }
-
+ 
 /* ======== MAIN CONTENT ======== */
 .content { }
-
+ 
 .session-header {
   background: var(--card);
   border: 1px solid var(--border);
@@ -383,7 +383,7 @@ body::before {
   color: #fff;
 }
 .btn-success:hover { background: #4a6b2c; }
-
+ 
 /* Volume note banner */
 .volume-note {
   background: var(--green-bg);
@@ -402,7 +402,7 @@ body::before {
   flex-shrink: 0;
 }
 .volume-note strong { color: #4a6b2c; }
-
+ 
 /* ======== EXERCISE TABLE ======== */
 .exercise-card {
   background: var(--card);
@@ -414,7 +414,7 @@ body::before {
   transition: box-shadow 0.2s;
 }
 .exercise-card:hover { box-shadow: var(--shadow-lg); }
-
+ 
 .ex-head {
   display: flex;
   align-items: center;
@@ -458,10 +458,10 @@ body::before {
 .tag-rpe { background: var(--bg); color: var(--muted); border: 1px solid var(--border); }
 .ex-toggle { color: var(--muted); font-size: 12px; transition: transform 0.2s; }
 .ex-head.open .ex-toggle { transform: rotate(180deg); }
-
+ 
 .ex-body { padding: 16px 18px; display: none; }
 .ex-body.open { display: block; }
-
+ 
 .ex-note {
   font-size: 11px;
   color: var(--muted);
@@ -472,7 +472,7 @@ body::before {
   border-left: 2px solid var(--border);
   padding-left: 10px;
 }
-
+ 
 /* Sets table */
 .sets-table {
   width: 100%;
@@ -494,7 +494,7 @@ body::before {
   vertical-align: middle;
 }
 .sets-table tr:last-child td { border-bottom: none; }
-
+ 
 .set-num {
   font-size: 11px;
   color: var(--muted);
@@ -549,7 +549,7 @@ body::before {
 .set-check.done { background: var(--green); border-color: var(--green); color: #fff; }
 .set-check.done::after { content: '✓'; }
 .set-pr { font-size: 10px; color: var(--green); font-weight: 500; }
-
+ 
 /* ======== DELOAD BANNER ======== */
 .deload-banner {
   background: linear-gradient(135deg, #f7f0e6, #ede4d4);
@@ -585,7 +585,7 @@ body::before {
   font-size: 11px;
   color: var(--accent-dark);
 }
-
+ 
 /* ======== LOG HISTORY ======== */
 .log-entry {
   background: var(--card);
@@ -616,7 +616,7 @@ body::before {
   font-family: 'DM Mono', monospace;
 }
 .log-delete:hover { border-color: var(--red); color: var(--red); }
-
+ 
 /* ======== BENCHMARKS ======== */
 .benchmark-item {
   display: flex;
@@ -642,7 +642,7 @@ body::before {
 .bm-check.done { background: var(--green); border-color: var(--green); color: #fff; }
 .bm-name { flex: 1; font-size: 11px; color: var(--text); }
 .bm-target { font-size: 11px; color: var(--gold); font-weight: 500; }
-
+ 
 /* ======== TOAST ======== */
 .toast {
   position: fixed;
@@ -662,7 +662,7 @@ body::before {
 }
 .toast.show { transform: translateY(0); opacity: 1; }
 .toast.success { background: var(--green); }
-
+ 
 /* ======== RESPONSIVE ======== */
 @media (max-width: 768px) {
   .main { grid-template-columns: 1fr; padding: 14px; gap: 14px; }
@@ -673,7 +673,7 @@ body::before {
   .session-header { flex-direction: column; }
   .session-actions { align-items: flex-start; flex-direction: row; flex-wrap: wrap; }
 }
-
+ 
 /* No-session state */
 .no-session {
   background: var(--card);
@@ -691,7 +691,7 @@ body::before {
   font-style: italic;
 }
 .no-session p { font-size: 12px; color: var(--muted); }
-
+ 
 /* ======== AUTH ======== */
 .auth-btn {
   display: flex;
@@ -803,7 +803,7 @@ body::before {
   font-family: 'DM Mono', monospace;
 }
 .login-skip:hover { color: var(--accent); }
-
+ 
 /* ======== CALENDAR ======== */
 .cal-nav {
   display: flex;
@@ -950,7 +950,7 @@ body::before {
 .heatmap-cell.d2 { background: #a8d08a; border-color: #90c06e; }
 .heatmap-cell.d3 { background: #7ab852; border-color: #62a03a; }
 .heatmap-cell.d4 { background: var(--green); border-color: #4a6b2c; }
-
+ 
 /* ======== Progression badge ======== */
 .prog-badge {
   display: inline-block;
@@ -964,7 +964,7 @@ body::before {
   border-radius: 3px;
   margin-left: 8px;
 }
-
+ 
 .session-complete-banner {
   background: linear-gradient(135deg, var(--green-bg), #d6eacc);
   border: 1px solid var(--green-light);
@@ -981,7 +981,7 @@ body::before {
 </style>
 </head>
 <body>
-
+ 
 <header class="header">
   <div class="header-inner">
     <div class="header-title">The <span>David</span> Blueprint</div>
@@ -1007,7 +1007,7 @@ body::before {
     </div>
   </div>
 </header>
-
+ 
 <!-- Login overlay -->
 <div class="login-overlay" id="loginOverlay">
   <div class="login-card">
@@ -1020,12 +1020,12 @@ body::before {
     <button class="login-skip" onclick="skipLogin()">Continue without signing in</button>
   </div>
 </div>
-
+ 
 <div class="main">
-
+ 
   <!-- ======= SIDEBAR ======= -->
   <aside class="sidebar">
-
+ 
     <div class="panel">
       <div class="panel-head">Select Day</div>
       <div class="panel-body">
@@ -1037,7 +1037,7 @@ body::before {
         </div>
       </div>
     </div>
-
+ 
     <div class="panel">
       <div class="panel-head">Mesocycle Progress</div>
       <div class="panel-body">
@@ -1074,29 +1074,29 @@ body::before {
         </div>
       </div>
     </div>
-
+ 
     <div class="panel">
       <div class="panel-head">Training Calendar</div>
       <div class="panel-body" id="calendarPanel">
         <!-- rendered by JS -->
       </div>
     </div>
-
+ 
     <div class="panel">
       <div class="panel-head">Phase 3 Benchmarks</div>
       <div class="panel-body" id="benchmarkList">
       </div>
     </div>
-
+ 
     <div class="panel">
       <div class="panel-head">Recent Sessions</div>
       <div class="panel-body" id="recentLog" style="padding:0;">
         <div style="padding:14px; font-size:11px; color:var(--muted); text-align:center;">No sessions logged yet.</div>
       </div>
     </div>
-
+ 
   </aside>
-
+ 
   <!-- ======= CONTENT ======= -->
   <main class="content" id="mainContent">
     <div class="no-session">
@@ -1104,16 +1104,16 @@ body::before {
       <p>Select a training day from the sidebar<br>to load your workout.</p>
     </div>
   </main>
-
+ 
 </div>
-
+ 
 <div class="toast" id="toast"></div>
-
+ 
 <script>
 // =============================================
 // DATA — Full program with week-based progressions
 // =============================================
-
+ 
 const DAYS = [
   { id: 'U1', label: 'Day 1', name: 'Upper A', tag: 'Chest · Back' },
   { id: 'L1', label: 'Day 2', name: 'Lower A', tag: 'Quads · Hams' },
@@ -1121,11 +1121,11 @@ const DAYS = [
   { id: 'L2', label: 'Day 4', name: 'Lower B', tag: 'Glutes · Hinge' },
   { id: 'P5', label: 'Day 5', name: 'Priority', tag: 'Weak Points' },
 ];
-
+ 
 // Returns list of exercises for a given day and week
 function getExercises(dayId, week) {
   const w = parseInt(week);
-
+ 
   const programs = {
     U1: [
       { name: 'Incline DB Press @ 30°', sets: getSets('U1', 'incline_press', w), reps: '8–10', rir: 2, rest: '2.5 min', tags: ['primary', 'weak-upper-chest'], note: 'Palms facing, elbows 45–75°. Touch upper chest/clavicle line. Scapulae retracted and depressed — "shoulders in back pockets." Lower on the chest than you think.' },
@@ -1140,7 +1140,7 @@ function getExercises(dayId, week) {
       ...(w >= 4 ? [{ name: 'Hammer Curl', sets: 3, reps: '10–12', rir: 1, rest: '90s', tags: ['isolation', 'new'], note: 'Neutral grip (palms facing each other). Hits brachialis + brachioradialis — builds arm THICKNESS and pushes the bicep peak up. Added Week 4.' }] : []),
       ...(w >= 5 ? [{ name: 'Dead Hang', sets: 3, reps: 'Max time (30–60s)', rir: null, rest: '60s', tags: ['forearm', 'grip'], note: 'Passive hang from pull-up bar. Shoulders at ears, no active engagement. Builds grip + thickens flexor tendons. Keep every week permanently.' }] : []),
     ],
-
+ 
     L1: [
       { name: 'Hack Squat Machine', sets: getSets('L1', 'hack_squat', w), reps: '6–10', rir: 2, rest: '3 min', tags: ['primary', 'weak-quads'], note: 'Feet mid-platform, shoulder-width, toes slightly out. Drive knees OVER toes — not back. Full depth (hamstrings to calves). Back pad removes the long-femur problem. This is your primary quad builder.' },
       { name: 'Romanian Deadlift (Smith or BB)', sets: getSets('L1', 'rdl', w), reps: '8–10', rir: 2, rest: '2.5 min', tags: ['primary'], note: 'HINGE, not squat. Push hips straight back. Bar path vertical, against shins the whole way. Stop just below the knee — mid-shin typically means lumbar is rounding. Neutral spine, neutral neck.' },
@@ -1151,7 +1151,7 @@ function getExercises(dayId, week) {
       ...(w >= 2 ? [] : []),
       ...(w >= 5 ? [{ name: 'Bulgarian Split Squat', sets: 2, reps: '10/leg', rir: 1, rest: '90s', tags: ['primary', 'new'], note: 'Vertical torso = quad-biased. Long legs love BSS — extended ROM maximizes stretch-mediated hypertrophy. Added as peak-week finisher.' }] : []),
     ],
-
+ 
     U2: [
       { name: 'Seated DB Overhead Press (bench ~80°)', sets: getSets('U2', 'ohp', w), reps: '8–10', rir: 2, rest: '2.5 min', tags: ['primary'], note: 'DB over BB — long arms allow natural arc. 80° bench angle (not fully upright). Glutes squeezed, ribs down. Stop at near-lockout — last 10° is triceps not delt.' },
       { name: 'Wide-Grip Lat Pulldown (pronated)', sets: getSets('U2', 'pulldown', w), reps: '8–12', rir: 2, rest: '2 min', tags: ['primary', 'weak-lats'], note: 'Grip ~1.5× biacromial width. Pull chest to bar, elbows drive down and back. Full stretch at top — scapula elevates. The V-taper builder.' },
@@ -1166,7 +1166,7 @@ function getExercises(dayId, week) {
       ...(w >= 4 ? [{ name: 'Reverse Curl (EZ bar)', sets: 3, reps: '10–12', rir: 1, rest: '90s', tags: ['forearm', 'new'], note: 'Pronated grip (palms down), curl normally. Brachioradialis — the thick muscle on the outer forearm near the elbow. Visible from the front. Wrists stay neutral throughout. Added Week 4.' }] : []),
       ...(w >= 5 ? [{ name: 'Dead Hang', sets: 3, reps: 'Max time (30–60s)', rir: null, rest: '60s', tags: ['forearm', 'grip'], note: 'Passive hang. Builds grip + flexor tendons. Keep every week permanently.' }] : []),
     ],
-
+ 
     L2: [
       { name: 'Machine or Smith Hip Thrust', sets: getSets('L2', 'hip_thrust', w), reps: '8–12', rir: 2, rest: '2.5 min', tags: ['primary', 'weak-glutes'], note: 'Contreras 2015: highest mean glute EMG of any exercise (~229% MVC). Shoulders on bench, bar/pad over hips. Drive through heels, SQUEEZE at top. Full hip extension — but do not hyperextend lumbar.' },
       { name: 'Front Squat (heels elevated) OR Bulgarian Split Squat', sets: getSets('L2', 'front_sq', w), reps: '6–10 / 8–12', rir: 2, rest: '2.5 min', tags: ['primary', 'weak-quads'], note: 'Front squat: heels on 1" plate/board. Upright torso bypasses the long-femur problem. BSS: vertical torso = quad-biased; 15–20° lean = glute-biased. Your choice each session.' },
@@ -1177,7 +1177,7 @@ function getExercises(dayId, week) {
       { name: 'Cable Crunch OR Hanging Leg Raise', sets: 3, reps: '12–15', rir: 1, rest: '60s', tags: ['core'], note: 'Cable crunch: round the spine, not hip-hinge. Leg raise: straight legs, controlled — hip flexors should not be the limiting factor.' },
       ...(w >= 5 ? [{ name: 'DB Glute Bridge (banded)', sets: 2, reps: '15–20', rir: 0, rest: '60s', tags: ['isolation', 'new', 'weak-glutes'], note: 'Peak-week glute burnout. DB on hips, band above knees for abduction activation. Contract hard at top. Skip if hips are beat up.' }] : []),
     ],
-
+ 
     P5: [
       { name: 'Cable Lateral Raise (behind-back, single-arm)', sets: 4, reps: '12–15', rir: 1, rest: '90s', tags: ['primary', 'weak-side-delt'], note: 'Third weekly side-delt hit. Lengthened-position side delt — critical for your shoulder-to-waist ratio. Cable behind back gives a unique stretched-position stimulus.' },
       { name: 'Incline DB Press @ 30° (lighter, rep-focused)', sets: 3, reps: '12–15', rir: 1, rest: '2 min', tags: ['primary', 'weak-upper-chest'], note: 'Third upper chest stimulus. Less load, more mind-muscle. Focus on feeling the clavicular head — place a finger on your upper chest to feel it fire.' },
@@ -1189,10 +1189,10 @@ function getExercises(dayId, week) {
       { name: 'Hip Abduction Machine (forward lean)', sets: 3, reps: '15–20', rir: 0, rest: '60s', tags: ['isolation', 'weak-glutes'], note: 'Third weekly glute medius/upper glute hit. The outer glute shelf that defines the classical silhouette from the front.' },
     ],
   };
-
+ 
   return programs[dayId] || [];
 }
-
+ 
 // Set count progression logic
 function getSets(day, exercise, week) {
   const w = parseInt(week);
@@ -1238,19 +1238,19 @@ function getSets(day, exercise, week) {
     cable_fly: [3, 3, 3, 3, 3],
     incline_curl: [3, 3, 3, 3, 3],
   };
-
+ 
   if (w === 6) {
     // Deload: half sets
     const prog = progression[exercise];
     const maxSets = prog ? prog[4] : (base[day] ? base[day][exercise] : 3);
     return Math.ceil(maxSets / 2);
   }
-
+ 
   const prog = progression[exercise];
   if (prog) return prog[Math.min(w - 1, 4)];
   return base[day] ? (base[day][exercise] || 3) : 3;
 }
-
+ 
 // =============================================
 // STATE
 // =============================================
@@ -1277,19 +1277,19 @@ let state = JSON.parse(localStorage.getItem('david_state') || 'null') || {
   calMonth: new Date().getMonth(),
   startDate: null, // first ever training date
 };
-
+ 
 function save() {
   localStorage.setItem('david_state', JSON.stringify(state));
   if (window._currentUser) {
     syncToFirebase();
   }
 }
-
+ 
 // =============================================
 // FIREBASE SYNC
 // =============================================
 let _syncTimer = null;
-
+ 
 function syncToFirebase() {
   // Debounce — wait 1.5s after last change before writing
   clearTimeout(_syncTimer);
@@ -1310,7 +1310,7 @@ function syncToFirebase() {
     }
   }, 1500);
 }
-
+ 
 async function loadFromFirebase(uid) {
   try {
     const db = window._fbDb;
@@ -1341,7 +1341,7 @@ async function loadFromFirebase(uid) {
     setSyncStatus('offline');
   }
 }
-
+ 
 async function logSessionToFirebase(sessionData) {
   if (!window._currentUser) return;
   try {
@@ -1356,7 +1356,7 @@ async function logSessionToFirebase(sessionData) {
     console.error('Session log error:', e);
   }
 }
-
+ 
 function setSyncStatus(status) {
   const indicator = document.getElementById('syncIndicator');
   const dot = document.getElementById('syncDot');
@@ -1374,7 +1374,7 @@ function setSyncStatus(status) {
     label.textContent = 'Offline';
   }
 }
-
+ 
 // =============================================
 // AUTH UI
 // =============================================
@@ -1388,14 +1388,14 @@ function renderUserHeader(user) {
     </button>
   `;
 }
-
+ 
 function renderSignedOutHeader() {
   document.getElementById('syncIndicator').style.display = 'none';
   document.getElementById('authArea').innerHTML = `
     <button class="auth-btn" onclick="signInGoogle()">Sign in with Google</button>
   `;
 }
-
+ 
 async function signInGoogle() {
   try {
     await window._fbSignInWithPopup(window._fbAuth, window._fbGoogleProvider);
@@ -1405,19 +1405,19 @@ async function signInGoogle() {
     showToast('Sign in failed — try again.');
   }
 }
-
+ 
 async function signOutUser() {
   if (!confirm('Sign out? Your data is saved to your account.')) return;
   await window._fbSignOut(window._fbAuth);
   window._currentUser = null;
   showToast('Signed out.');
 }
-
+ 
 function skipLogin() {
   document.getElementById('loginOverlay').style.display = 'none';
   showToast('Running without sync. Data saves locally only.');
 }
-
+ 
 // =============================================
 // INIT
 // =============================================
@@ -1428,15 +1428,15 @@ function init() {
   renderBenchmarks();
   renderRecentLog();
   renderCalendar();
-
+ 
   document.getElementById('weekSelect').value = state.currentWeek;
   document.getElementById('statWeek').textContent = state.currentWeek;
-
+ 
   if (state.currentDay) {
     renderSession(state.currentDay);
     highlightDay(state.currentDay);
   }
-
+ 
   // Login overlay stays visible until Firebase resolves auth state
   // onAuthStateChanged will hide it if user is signed in
   // skipLogin() hides it if user chooses to continue without signing in
@@ -1448,7 +1448,7 @@ function init() {
     }
   }, 3000);
 }
-
+ 
 // =============================================
 // DAY GRID
 // =============================================
@@ -1468,7 +1468,7 @@ function renderDayGrid() {
     `;
   }).join('');
 }
-
+ 
 function highlightDay(dayId) {
   document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.day-btn').forEach(b => {
@@ -1477,7 +1477,7 @@ function highlightDay(dayId) {
     }
   });
 }
-
+ 
 function selectDay(dayId) {
   state.currentDay = dayId;
   save();
@@ -1485,7 +1485,7 @@ function selectDay(dayId) {
   renderSession(dayId);
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
-
+ 
 function pickMakeupDay() {
   const day = prompt('Enter day ID to make up (U1, L1, U2, L2, P5):');
   if (day && DAYS.find(d => d.id === day.toUpperCase())) {
@@ -1493,7 +1493,7 @@ function pickMakeupDay() {
     showToast('Makeup day loaded — crush it!');
   }
 }
-
+ 
 // =============================================
 // SESSION RENDER
 // =============================================
@@ -1502,19 +1502,19 @@ function renderSession(dayId) {
   const week = state.currentWeek;
   const exercises = getExercises(dayId, week);
   const isDeload = parseInt(week) === 6;
-
+ 
   const content = document.getElementById('mainContent');
-
+ 
   const completedSetsCount = exercises.reduce((acc, ex, ei) => {
     for (let si = 0; si < ex.sets; si++) {
       if (state.setsDone[`${dayId}_${ei}_${si}`]) acc++;
     }
     return acc;
   }, 0);
-
+ 
   const totalSets = exercises.reduce((acc, ex) => acc + ex.sets, 0);
   const sessionComplete = completedSetsCount === totalSets && totalSets > 0;
-
+ 
   // Volume note for current week
   const volumeNotes = {
     1: 'Week 1 — Establish baseline. No failure. Focus on form and feeling each muscle.',
@@ -1524,7 +1524,7 @@ function renderSession(dayId) {
     5: 'Week 5 — Peak volume. Push near failure on isolations. Expect to feel cooked.',
     6: 'Week 6 — DELOAD. 50% sets, 60% load. This is mandatory recovery.',
   };
-
+ 
   let html = `
     <div class="session-header">
       <div>
@@ -1537,7 +1537,7 @@ function renderSession(dayId) {
       </div>
     </div>
   `;
-
+ 
   if (sessionComplete) {
     html += `
       <div class="session-complete-banner">
@@ -1549,7 +1549,7 @@ function renderSession(dayId) {
       </div>
     `;
   }
-
+ 
   if (isDeload) {
     html += `
       <div class="deload-banner">
@@ -1566,20 +1566,20 @@ function renderSession(dayId) {
   } else {
     html += `<div class="volume-note"><div class="vn-icon">📈</div><div><strong>Week ${week}:</strong> ${volumeNotes[week]}</div></div>`;
   }
-
+ 
   exercises.forEach((ex, ei) => {
     const isNew = ex.tags && ex.tags.includes('new');
     const isWeak = ex.tags && ex.tags.some(t => t.startsWith('weak-'));
     const isForearm = ex.tags && ex.tags.includes('forearm');
-
+ 
     let tagHtml = '';
     if (isNew) tagHtml += '<span class="tag tag-new">+ Added this week</span>';
     if (isWeak) tagHtml += '<span class="tag tag-weak">Priority</span>';
     if (isForearm) tagHtml += '<span class="tag tag-primary">Forearm</span>';
-
+ 
     const rirText = ex.rir !== null && ex.rir !== undefined ? `RIR ${ex.rir}` : 'Max effort';
     tagHtml += `<span class="tag tag-rpe">${rirText} · ${ex.rest}</span>`;
-
+ 
     // Build sets rows
     let setsHtml = `
       <table class="sets-table">
@@ -1595,23 +1595,23 @@ function renderSession(dayId) {
         </thead>
         <tbody>
     `;
-
+ 
     for (let si = 0; si < ex.sets; si++) {
       const key = `${dayId}_${ei}_${si}`;
       const wKey = `w_${dayId}_${ei}_${si}`;
       const rKey = `r_${dayId}_${ei}_${si}`;
       const prevKey = `prev_${dayId}_${ei}_${si}`;
-
+ 
       const savedWeight = state.weights[wKey] || '';
       const savedReps = state.reps[rKey] || '';
       const isDone = state.setsDone[key] || false;
-
+ 
       // Check for PR (weight higher than any previous for this exercise/set)
       const prevBest = state.weights[prevKey] || 0;
       const isPR = savedWeight && parseInt(savedWeight) > parseInt(prevBest);
-
+ 
       const deloadTarget = isDeload ? ` (${Math.round((parseInt(savedWeight) || 100) * 0.6)} lbs)` : '';
-
+ 
       setsHtml += `
         <tr style="${isDone ? 'background:rgba(92,122,58,0.04);' : ''}">
           <td class="set-num">${si + 1}</td>
@@ -1635,9 +1635,9 @@ function renderSession(dayId) {
         </tr>
       `;
     }
-
+ 
     setsHtml += '</tbody></table>';
-
+ 
     html += `
       <div class="exercise-card" id="ex_${dayId}_${ei}">
         <div class="ex-head" onclick="toggleEx(this)">
@@ -1653,10 +1653,10 @@ function renderSession(dayId) {
       </div>
     `;
   });
-
+ 
   content.innerHTML = html;
 }
-
+ 
 // =============================================
 // INTERACTIONS
 // =============================================
@@ -1665,7 +1665,7 @@ function toggleEx(head) {
   head.classList.toggle('open');
   body.classList.toggle('open');
 }
-
+ 
 function saveWeight(dayId, ei, si, val) {
   const wKey = `w_${dayId}_${ei}_${si}`;
   state.weights[wKey] = val;
@@ -1676,24 +1676,24 @@ function saveWeight(dayId, ei, si, val) {
   }
   save();
 }
-
+ 
 function saveReps(dayId, ei, si, val) {
   const rKey = `r_${dayId}_${ei}_${si}`;
   state.reps[rKey] = val;
   save();
 }
-
+ 
 function toggleSet(dayId, ei, si) {
   const key = `${dayId}_${ei}_${si}`;
   state.setsDone[key] = !state.setsDone[key];
   save();
-
+ 
   // Re-render just the check
   const check = document.querySelector(`#ex_${dayId}_${ei} .sets-table tbody tr:nth-child(${si + 1}) .set-check`);
   if (check) {
     check.classList.toggle('done', state.setsDone[key]);
   }
-
+ 
   // Check if PR
   const wKey = `w_${dayId}_${ei}_${si}`;
   const prevKey = `prev_${dayId}_${ei}_${si}`;
@@ -1704,21 +1704,21 @@ function toggleSet(dayId, ei, si) {
     save();
     if (currentWeight > 0) showToast(`🏆 New PR — ${currentWeight} lbs!`, true);
   }
-
+ 
   // Update session stats
   renderStats();
 }
-
+ 
 function markSessionComplete(dayId) {
   const today = todayStr();
   if (!state.completedDays[today]) state.completedDays[today] = [];
   if (!state.completedDays[today].includes(dayId)) {
     state.completedDays[today].push(dayId);
   }
-
+ 
   // Record the very first training date
   if (!state.startDate) state.startDate = today;
-
+ 
   // Calculate tonnage for this session
   const exercises = getExercises(dayId, state.currentWeek);
   let tonnage = 0;
@@ -1731,20 +1731,20 @@ function markSessionComplete(dayId) {
       tonnage += w * r;
     }
   });
-
+ 
   // Update streak
   const lastDate = state.lastTrainDate;
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
   const yStr = yesterday.toISOString().split('T')[0];
-
+ 
   if (lastDate === yStr || lastDate === today) {
     if (lastDate !== today) state.streak = (state.streak || 0) + 1;
   } else {
     state.streak = 1;
   }
   state.lastTrainDate = today;
-
+ 
   // Log entry
   const day = DAYS.find(d => d.id === dayId);
   state.logs.unshift({
@@ -1755,10 +1755,10 @@ function markSessionComplete(dayId) {
     totalSets: exercises.reduce((a, e) => a + e.sets, 0),
     tonnage: Math.round(tonnage / 2000 * 10) / 10,
   });
-
+ 
   // Keep last 20 logs
   if (state.logs.length > 20) state.logs = state.logs.slice(0, 20);
-
+ 
   // Log detailed session to Firebase sessions collection
   logSessionToFirebase({
     date: today,
@@ -1776,7 +1776,7 @@ function markSessionComplete(dayId) {
       }))
     }))
   });
-
+ 
   save();
   renderDayGrid();
   renderStats();
@@ -1785,7 +1785,7 @@ function markSessionComplete(dayId) {
   renderSession(dayId);
   showToast('Session logged. Rest, eat, grow. 🏛️', true);
 }
-
+ 
 function clearSession(dayId) {
   if (!confirm('Clear all weights and reps for this session?')) return;
   const exercises = getExercises(dayId, state.currentWeek);
@@ -1800,7 +1800,7 @@ function clearSession(dayId) {
   renderSession(dayId);
   showToast('Session cleared.');
 }
-
+ 
 // =============================================
 // WEEK CONTROL
 // =============================================
@@ -1813,24 +1813,24 @@ function setWeek(w) {
   if (state.currentDay) renderSession(state.currentDay);
   showToast(`Week ${w} loaded.`);
 }
-
+ 
 // =============================================
 // STATS
 // =============================================
 function renderStats() {
   const totalSessions = state.logs.length;
   const totalTonnage = state.logs.reduce((a, l) => a + (l.tonnage || 0), 0);
-
+ 
   document.getElementById('statSessions').textContent = totalSessions;
   document.getElementById('statTonnage').textContent = Math.round(totalTonnage * 10) / 10;
   document.getElementById('statStreak').textContent = state.streak || 0;
   document.getElementById('statWeek').textContent = state.currentWeek;
-
+ 
   const weekPct = Math.round((state.currentWeek / 6) * 100);
   document.getElementById('weekPct').textContent = weekPct + '%';
   document.getElementById('weekFill').style.width = weekPct + '%';
 }
-
+ 
 function renderPhaseDots() {
   const dots = document.getElementById('phaseDots');
   dots.innerHTML = [1,2,3,4,5,6].map(w => {
@@ -1840,7 +1840,7 @@ function renderPhaseDots() {
     return `<div class="phase-dot ${cls}" title="Week ${w}${w===6?' (Deload)':''}"></div>`;
   }).join('');
 }
-
+ 
 // =============================================
 // BENCHMARKS
 // =============================================
@@ -1853,7 +1853,7 @@ const BENCHMARKS = [
   { key: 'incline_85', name: 'Incline DB Press', target: '85 lb × 8' },
   { key: 'calf_4p', name: 'Standing Calf Raise', target: '4 plates × 12 (2s pause)' },
 ];
-
+ 
 function renderBenchmarks() {
   const container = document.getElementById('benchmarkList');
   container.innerHTML = BENCHMARKS.map(b => `
@@ -1864,7 +1864,7 @@ function renderBenchmarks() {
       <div class="bm-target">${b.target}</div>
     </div>
   `).join('');
-
+ 
   const done = Object.values(state.benchmarks).filter(Boolean).length;
   if (done === BENCHMARKS.length) {
     container.innerHTML += `<div style="text-align:center;padding:12px;font-size:11px;color:var(--green);border-top:1px solid var(--border);margin-top:8px;">🏛️ Phase 3 Ready</div>`;
@@ -1872,14 +1872,14 @@ function renderBenchmarks() {
     container.innerHTML += `<div style="text-align:center;padding:8px;font-size:10px;color:var(--muted);">${done}/${BENCHMARKS.length} benchmarks hit</div>`;
   }
 }
-
+ 
 function toggleBenchmark(key) {
   state.benchmarks[key] = !state.benchmarks[key];
   save();
   renderBenchmarks();
   if (state.benchmarks[key]) showToast('Benchmark achieved! 🏆', true);
 }
-
+ 
 // =============================================
 // RECENT LOG
 // =============================================
@@ -1899,93 +1899,93 @@ function renderRecentLog() {
     </div>
   `).join('');
 }
-
+ 
 function deleteLog(i) {
   state.logs.splice(i, 1);
   save();
   renderRecentLog();
   renderStats();
 }
-
+ 
 // =============================================
 // UTILS
 // =============================================
 function todayStr() {
   return new Date().toISOString().split('T')[0];
 }
-
+ 
 function showToast(msg, success = false) {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.className = 'toast show' + (success ? ' success' : '');
   setTimeout(() => { t.className = 'toast'; }, 2800);
 }
-
+ 
 // =============================================
 // CALENDAR
 // =============================================
-
+ 
 const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const DOW = ['Su','Mo','Tu','We','Th','Fr','Sa'];
-
+ 
 // Day type color map for dots
 const DAY_COLORS = { U1:'#5c7a3a', L1:'#8b6f47', U2:'#4a7a8b', L2:'#8b4a6f', P5:'#9b6a1a' };
 const DAY_ABBR = { U1:'UA', L1:'LA', U2:'UB', L2:'LB', P5:'P5' };
-
+ 
 function renderCalendar() {
   const panel = document.getElementById('calendarPanel');
   if (!panel) return;
-
+ 
   // Ensure state has cal props
   if (state.calYear == null) state.calYear = new Date().getFullYear();
   if (state.calMonth == null) state.calMonth = new Date().getMonth();
-
+ 
   const year = state.calYear;
   const month = state.calMonth;
   const today = new Date();
   const todayISO = todayStr();
-
+ 
   const firstDay = new Date(year, month, 1);
   const lastDay = new Date(year, month + 1, 0);
   const startDow = firstDay.getDay(); // 0=Sun
   const daysInMonth = lastDay.getDate();
-
+ 
   // Build day cells
   let cells = '';
   // Day-of-week headers
   DOW.forEach(d => { cells += `<div class="cal-dow">${d}</div>`; });
-
+ 
   // Empty cells before month start
   for (let i = 0; i < startDow; i++) {
     cells += `<div class="cal-day empty"></div>`;
   }
-
+ 
   for (let d = 1; d <= daysInMonth; d++) {
     const iso = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     const isToday = iso === todayISO;
     const trainedDays = state.completedDays[iso] || [];
     const wasTrained = trainedDays.length > 0;
     const isFuture = iso > todayISO;
-
+ 
     let cls = 'cal-day';
     if (isToday) cls += ' today';
     else if (wasTrained) cls += ' trained';
     else if (!isFuture) cls += ' rest';
-
+ 
     // Dots for each day type done
     const dots = trainedDays.map(id =>
       `<div class="cal-dot" style="background:${DAY_COLORS[id]||'var(--green)'}" title="${id}"></div>`
     ).join('');
-
+ 
     const tooltip = wasTrained ? trainedDays.map(id => DAY_ABBR[id] || id).join(', ') : (isFuture ? '' : 'Rest');
-
+ 
     cells += `
       <div class="${cls}" title="${tooltip}">
         <span class="cal-day-num">${d}</span>
         ${wasTrained ? `<div class="cal-dot-row">${dots}</div>` : ''}
       </div>`;
   }
-
+ 
   // Fill remaining cells to complete last row
   const totalCells = startDow + daysInMonth;
   const remainder = totalCells % 7;
@@ -1994,7 +1994,7 @@ function renderCalendar() {
       cells += `<div class="cal-day empty"></div>`;
     }
   }
-
+ 
   // ---- Stats ----
   // Total training days this month
   let monthTrained = 0;
@@ -2002,7 +2002,7 @@ function renderCalendar() {
     const iso = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     if ((state.completedDays[iso] || []).length > 0) monthTrained++;
   }
-
+ 
   // Days since first session
   let daysSinceStart = '—';
   if (state.startDate) {
@@ -2010,10 +2010,10 @@ function renderCalendar() {
     const diff = Math.floor((today - start) / (1000*60*60*24));
     daysSinceStart = diff;
   }
-
+ 
   // Total lifetime training days
   const lifetimeDays = Object.values(state.completedDays).filter(v => v.length > 0).length;
-
+ 
   // ---- 90-day heatmap ----
   let heatCells = '';
   for (let i = 89; i >= 0; i--) {
@@ -2029,7 +2029,7 @@ function renderCalendar() {
     const label = count > 0 ? `${iso}: ${count} session(s)` : iso;
     heatCells += `<div class="heatmap-cell ${intensity}" title="${label}"></div>`;
   }
-
+ 
   panel.innerHTML = `
     <div class="cal-nav">
       <button onclick="calPrev()">‹</button>
@@ -2071,21 +2071,21 @@ function renderCalendar() {
     </div>
   `;
 }
-
+ 
 function calPrev() {
   if (state.calMonth === 0) { state.calMonth = 11; state.calYear--; }
   else state.calMonth--;
   save();
   renderCalendar();
 }
-
+ 
 function calNext() {
   if (state.calMonth === 11) { state.calMonth = 0; state.calYear++; }
   else state.calMonth++;
   save();
   renderCalendar();
 }
-
+ 
 // =============================================
 // BOOT
 // =============================================
