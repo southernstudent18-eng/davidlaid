@@ -8,7 +8,7 @@
 <!-- Firebase -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
+import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDoc, collection, addDoc, serverTimestamp }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -26,8 +26,9 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const provider = new GoogleAuthProvider();
 
-// Expose to global scope so non-module functions can call them
+// Expose to global scope
 window._fbAuth = auth;
 window._fbDb = db;
 window._fbDoc = doc;
@@ -36,9 +37,20 @@ window._fbGetDoc = getDoc;
 window._fbCollection = collection;
 window._fbAddDoc = addDoc;
 window._fbServerTimestamp = serverTimestamp;
-window._fbGoogleProvider = new GoogleAuthProvider();
-window._fbSignInWithPopup = signInWithPopup;
+window._fbGoogleProvider = provider;
+window._fbSignInWithRedirect = signInWithRedirect;
 window._fbSignOut = signOut;
+
+// Handle redirect result when page loads back after Google login
+getRedirectResult(auth).then(result => {
+  if (result && result.user) {
+    // User just came back from Google redirect — auth state will fire below
+    showToast('Signed in! Loading your data...', true);
+  }
+}).catch(err => {
+  console.error('Redirect result error:', err);
+  showToast('Sign in failed — try again.');
+});
 
 // Watch auth state
 onAuthStateChanged(auth, async (user) => {
@@ -1398,8 +1410,9 @@ function renderSignedOutHeader() {
 
 async function signInGoogle() {
   try {
-    await window._fbSignInWithPopup(window._fbAuth, window._fbGoogleProvider);
-    // onAuthStateChanged will handle the rest
+    showToast('Redirecting to Google...');
+    await window._fbSignInWithRedirect(window._fbAuth, window._fbGoogleProvider);
+    // Page will redirect — no code runs after this
   } catch (e) {
     console.error('Sign in error:', e);
     showToast('Sign in failed — try again.');
